@@ -1,40 +1,39 @@
 package com.hxm.demo1;
 
-import com.hxm.bean.Area;
+import com.hxm.bean.City;
+import com.hxm.bean.Street;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class Areas {
+public class Streets {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         /*csv文件读取*/
-        File csvArea = new File("E:\\GraduationProject\\参考材料\\Administrative-divisions-of-China-master\\dist\\areas.csv");
-        csvArea.setReadable(true);
-        csvArea.setWritable(true);
-        List<Area> areaList = new ArrayList<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(csvArea))) {
+        File csvStreet = new File("E:\\GraduationProject\\参考材料\\Administrative-divisions-of-China-master\\dist\\streets.csv");
+        csvStreet.setReadable(true);
+        csvStreet.setWritable(true);
+        List<Street> streetList = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(csvStreet))) {
             String line = "";
             while ((line=bufferedReader.readLine())!=null){
-                Area area=new Area();
+                Street street = new Street();
                 String[] lineStr = line.split(",");
-                area.setCode(lineStr[0]);
-                area.setName(lineStr[1].replace("\""," "));
-                area.setCityCode(lineStr[2]);
-                area.setProvinceCode(lineStr[3]);
-//                System.out.println(area);
-                areaList.add(area);
+                street.setCode(lineStr[0]);
+                street.setName(lineStr[1].replace("\""," "));
+                street.setAreaCode(lineStr[2]);
+                street.setProvinceCode(lineStr[3]);
+                street.setCityCode(lineStr[4]);
+                streetList.add(street);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(areaList);
+        System.out.println(streetList);
 
         /*插入数据库*/
         Class.forName("com.mysql.jdbc.Driver");
@@ -43,13 +42,15 @@ public class Areas {
         String password = "root";
         Connection myConnection = DriverManager.getConnection(url,user,password);
         Statement mystatement = myConnection.createStatement();
-        String sql = "insert into areas values(?,?,?,?);";
-        for (Area area : areaList) {
+        /*SQL语句要改*/
+        String sql = "insert into streets values(?,?,?,?,?);";
+        for (Street street : streetList) {
             PreparedStatement preparedStatement = myConnection.prepareStatement(sql);
-            preparedStatement.setString(1,area.getCode());
-            preparedStatement.setString(2,area.getName());
-            preparedStatement.setString(3,area.getCityCode());
-            preparedStatement.setString(4,area.getProvinceCode());
+            preparedStatement.setString(1,street.getCode());
+            preparedStatement.setString(2,street.getName());
+            preparedStatement.setString(3,street.getAreaCode());
+            preparedStatement.setString(4,street.getProvinceCode());
+            preparedStatement.setString(5,street.getCityCode());
             int result=preparedStatement.executeUpdate();
         }
 
